@@ -1,0 +1,7 @@
+book_filename: "Mixed-Models-Small-Sample-Tutorial-bs4"
+new_session: true
+before_chapter_script: _common.R
+delete_merged_file: true
+language:
+  ui:
+    chapter_name: "Chapter "
