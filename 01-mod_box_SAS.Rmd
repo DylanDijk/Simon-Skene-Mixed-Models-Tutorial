@@ -5,35 +5,40 @@
 
 ## Example
 
-To show how to calculate the modified box corrected F statistic with mixed models in SAS.
-e show present the code used by Simon Skene to calculate the results given in his paper.
+### Cardiac enzyme
+
+To show how to calculate the modified box corrected F statistic with mixed models in SAS, we present the code used by Simon Skene to calculate the results for example 6.1 in the second paper^[@skene_analysis_2010_II].
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = FALSE)
 ```
 
+
+To reproduce the examples in the paper we need to import the datasets that were used. Alongside this tutorial we have a GitHub repository that contains a [folder](https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/tree/main/Data_Images_Figures "GitHub folder with datasets") with the **datasets** used in the paper  so they can be easily downloaded.
+
+***
+
+In SAS we can import the Cardiac Enzyme dataset directly from the GitHub repository by running the code:
+
 ```{sas, eval = FALSE}
-proc import datafile="S:\Shared_Projects\RO06_Surrey_CTU_Statistics\Dylan\Small samples\R code\Mixed-Models-Small-Sample-Tutorial-bs4\Data_Images_Figures\The Cardiac Enzyme Data - Reduced Data set.csv"
-        out=cardiac_data
-        dbms=csv
-        replace;
-    
+filename cardiac url "https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/The%20Cardiac%20Enzyme%20Data%20-%20Reduced%20Data%20set.csv";
+
+proc import file=cardiac out=cardiac_data dbms=csv;
 run;
 ```
 
-
+Next we need to create the mixed model. For this example we had no random effects and therefore do not include a `random` statement, however we have an unstructured covariance matrix and we can define this is using the `repeated` statement.
 
 ```{sas, eval = FALSE}
-
 proc mixed data=cardiac_data;
 class dog trt time;
 model atp=trt time trt*time/ ddfm=kr s;
 repeated time/type=un subject=dog r=4;
 run;
+```
 
 
-
-
+```{sas}
 title2 "Inference Using Box Corrections";
 
 proc iml;

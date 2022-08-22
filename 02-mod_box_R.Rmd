@@ -108,15 +108,14 @@ In this section we look at recreating the examples given in section 6 of the sec
 
 This example is covered in Section 6.1 of the second  paper^[@skene_analysis_2010_II]. Section 6.1 of the paper applies the modified Box correction twice to this dataset, once with the original versiona and after including artificial dropouts to the dataset.
 
-Importing the dataset, and converting a selection of variables to factors.
-**Need to select way for people to download file, should just make Github repo with csv file.**
+Importing the dataset from GitHub repository, and converting a selection of variables to factors.
 
 ```{r, eval=FALSE}
-Cardiac_enzyme_data = read.csv("Data_Images_Figures/The Cardiac Enzyme Data - Reduced Data set.csv")
+Cardiac_enzyme_data = read.csv("https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/The%20Cardiac%20Enzyme%20Data%20-%20Reduced%20Data%20set.csv")
 Cardiac_enzyme_data$dog = as.factor(Cardiac_enzyme_data$dog)
 Cardiac_enzyme_data$trt = as.factor(Cardiac_enzyme_data$trt)
 Cardiac_enzyme_data$time = as.factor(Cardiac_enzyme_data$time)
-```
+``` 
 
 Here we are creating the **nlme** models. In this examples I have set `glsControl(tolerance = 10^-8)`, this is too match the convergence criteria used by **nlme** to the default convergence criteria used by PROC MIXED in SAS.
 
@@ -128,6 +127,7 @@ model = gls(model = atp ~  trt + time + trt:time,
             data = Cardiac_enzyme_data,
             correlation = corSymm(form =~ as.numeric(time)|dog),
             weights = varIdent(form =~ 1|time))
+
 
 model_r = gls(model = atp ~ trt + time,
               data = Cardiac_enzyme_data,
@@ -207,7 +207,7 @@ model_r = gls(model = atp ~ trt + time,
 Box_correction_modified_nlme(model = model, model_r = model_r, data = Cardiac_enzyme_data_miss)
 ```
 
-### Guinea pigs
+### Guinea pigs {#Guinea-pigs}
 
 Importing the dataset.
 

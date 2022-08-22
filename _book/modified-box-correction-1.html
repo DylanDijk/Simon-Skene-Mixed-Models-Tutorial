@@ -67,14 +67,14 @@
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html"><span class="header-section-number">1</span> Introduction</a></li>
 <li class="book-part">SAS</li>
-<li><a class="" href="modified-box-correction.html"><span class="header-section-number">2</span> Modified Box Correction</a></li>
+<li><a class="" href="Modified-Box-Correction-SAS.html"><span class="header-section-number">2</span> Modified Box Correction</a></li>
 <li class="book-part">R</li>
 <li><a class="active" href="modified-box-correction-1.html"><span class="header-section-number">3</span> Modified Box Correction</a></li>
 <li><a class="" href="references.html">References</a></li>
 </ul>
 
         <div class="book-extra">
-          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+          <p><a id="book-repo" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial">View book source <i class="fab fa-github"></i></a></p>
         </div>
       </nav>
 </div>
@@ -88,7 +88,7 @@
 </h2>
 <p>Here we provide a function that calculates the modified box correction from mixed models constructed using the <strong>nlme</strong> package.</p>
 <p>The function takes as input two <strong>nlme</strong> models, the input variable <code>model</code> is the full model then <code>model_r</code> should be the model with the variables removed that we want to test for significance in the model.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">Box_correction_modified_nlme</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">model_r</span>, <span class="va">data</span>, <span class="va">Sigma</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -100,7 +100,7 @@
 <span>  <span class="va">ind</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/match.html">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Response variable vector</span></span>
-<span>  <span class="va">Y</span> <span class="op">=</span> <span class="fu">getResponse</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">Y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span></span>
 <span>  </span>
 <span>  <span class="co"># Design matrix for model with removed variables</span></span>
@@ -128,7 +128,7 @@
 <span>        <span class="co"># repeats = as.numeric(levels(model$groups))</span></span>
 <span>        </span>
 <span>        <span class="co"># Creating block matrix for model with correlated errors</span></span>
-<span>        <span class="va">Sigma</span> <span class="op">=</span> <span class="fu">getVarCov</span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
+<span>        <span class="va">Sigma</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/getVarCov.html">getVarCov</a></span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
 <span>        <span class="va">Sigma</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html">nlevels</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">groups</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/kronecker.html">%x%</a></span> <span class="va">Sigma</span></span>
 <span>          <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">ind</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>            <span class="va">Sigma</span> <span class="op">=</span> <span class="va">Sigma</span><span class="op">[</span><span class="op">-</span><span class="va">ind</span>,<span class="op">-</span><span class="va">ind</span><span class="op">]</span></span>
@@ -174,20 +174,19 @@
 <span class="header-section-number">3.2</span> Examples<a class="anchor" aria-label="anchor" href="#examples"><i class="fas fa-link"></i></a>
 </h2>
 <p>In this section we look at recreating the examples given in section 6 of the second paper.</p>
-<div id="cardiac-enzyme" class="section level3" number="3.2.1">
+<div id="cardiac-enzyme-1" class="section level3" number="3.2.1">
 <h3>
-<span class="header-section-number">3.2.1</span> Cardiac enzyme<a class="anchor" aria-label="anchor" href="#cardiac-enzyme"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.2.1</span> Cardiac enzyme<a class="anchor" aria-label="anchor" href="#cardiac-enzyme-1"><i class="fas fa-link"></i></a>
 </h3>
-<p>This example is covered in Section 6.1 of the second paper (cite). Section 6.1 of the paper applies the modified Box correction twice to this dataset, once with the original versiona and after including artificial dropouts to the dataset.</p>
-<p>Importing the dataset, and converting a selection of variables to factors.
-<strong>Need to select way for people to download file, should just make Github repo with csv file.</strong></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Cardiac_enzyme_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="st">"Data_Images_Figures/The Cardiac Enzyme Data - Reduced Data set.csv"</span><span class="op">)</span></span>
+<p>This example is covered in Section 6.1 of the second paper<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;&lt;span class="citation"&gt;Skene and Kenward&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;'><sup>4</sup></a>. Section 6.1 of the paper applies the modified Box correction twice to this dataset, once with the original versiona and after including artificial dropouts to the dataset.</p>
+<p>Importing the dataset from GitHub repository, and converting a selection of variables to factors.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Cardiac_enzyme_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/The%20Cardiac%20Enzyme%20Data%20-%20Reduced%20Data%20set.csv"</span><span class="op">)</span></span>
 <span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">dog</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">dog</span><span class="op">)</span></span>
 <span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">trt</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">trt</span><span class="op">)</span></span>
 <span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">time</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Cardiac_enzyme_data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
-<p>Here we are creating the <strong>nlme</strong> models the</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>Here we are creating the <strong>nlme</strong> models. In this examples I have set <code>glsControl(tolerance = 10^-8)</code>, this is too match the convergence criteria used by <strong>nlme</strong> to the default convergence criteria used by PROC MIXED in SAS.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/">nlme</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/glsControl.html">glsControl</a></span><span class="op">(</span>tolerance <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">8</span><span class="op">)</span></span>
 <span></span>
@@ -196,29 +195,45 @@
 <span>            correlation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/corSymm.html">corSymm</a></span><span class="op">(</span>form <span class="op">=</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span><span class="op">|</span><span class="va">dog</span><span class="op">)</span>,</span>
 <span>            weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/varIdent.html">varIdent</a></span><span class="op">(</span>form <span class="op">=</span><span class="op">~</span> <span class="fl">1</span><span class="op">|</span><span class="va">time</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span></span>
 <span><span class="va">model_r</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">atp</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">time</span>,</span>
 <span>              data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span>,</span>
 <span>              correlation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/corSymm.html">corSymm</a></span><span class="op">(</span>form <span class="op">=</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span><span class="op">|</span><span class="va">dog</span><span class="op">)</span>,</span>
-<span>              weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/varIdent.html">varIdent</a></span><span class="op">(</span>form <span class="op">=</span><span class="op">~</span> <span class="fl">1</span><span class="op">|</span><span class="va">time</span><span class="op">)</span><span class="op">)</span></span>
+<span>              weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/varIdent.html">varIdent</a></span><span class="op">(</span>form <span class="op">=</span><span class="op">~</span> <span class="fl">1</span><span class="op">|</span><span class="va">time</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>We can compare the results from the <code>Box_correction_modified_nlme()</code> function results given in the upper panel of Table VII in the second paper.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">Box_correction_modified_nlme</span><span class="op">(</span>data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span>, model <span class="op">=</span> <span class="va">model</span>, model_r <span class="op">=</span> <span class="va">model_r</span><span class="op">)</span></span></code></pre></div>
+<p>In addition to computing the p-value using the modified Box corrected F statistic, we can use the <strong>lmerTest</strong> package to compute some of the other p-values in Table VII.</p>
+<p>The other p-values are computed using Wald tests with the Kenward-Roger adjustment.</p>
+<p>Here we</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/runehaubo/lmerTestR">lmerTest</a></span><span class="op">)</span></span>
+<span><span class="va">m1</span> <span class="op">=</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html">lmer</a></span><span class="op">(</span><span class="va">atp</span> <span class="op">~</span>  <span class="va">trt</span> <span class="op">+</span> <span class="va">time</span> <span class="op">+</span> <span class="va">trt</span><span class="op">:</span><span class="va">time</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">dog</span><span class="op">)</span>,</span>
+<span>              data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span><span class="op">)</span></span>
 <span></span>
+<span><span class="va">m1</span> <span class="op">=</span> <span class="fu">lme4</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer</a></span><span class="op">(</span><span class="va">atp</span> <span class="op">~</span>  <span class="va">trt</span> <span class="op">+</span> <span class="va">time</span> <span class="op">+</span> <span class="va">trt</span><span class="op">:</span><span class="va">time</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">dog</span><span class="op">)</span>,</span>
+<span>              data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">Box_correction_modified_nlme</span><span class="op">(</span>data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span>, model <span class="op">=</span> <span class="va">model</span>, model_r <span class="op">=</span> <span class="va">model_r</span><span class="op">)</span></span></code></pre></div>
-<p>You can compare your results to the results given in the upper panel of Table VII in the second paper. The results may differ slightly due to different convergence criteria used by the <strong>nlme</strong> package in R and <strong>PROC MIXED</strong> in SAS.</p>
-<p>In the examples I have set <code>glsControl(tolerance = 10^-8)</code>, this is too match the convergence criteria used by <strong>nlme</strong> to the default convergence criteria used by PROC MIXED in SAS.</p>
-<p>The results in the lower panel of of Table VII were computed by applying the same method to the same dataset but now with artificial missing data introduced.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">m1</span>, ddf <span class="op">=</span> <span class="st">"Kenward-Roger"</span><span class="op">)</span></span></code></pre></div>
+<p>The anova method for the S3 method for class ‘lmerModLmerTest’ uses the KRmodcomp function from the pbkrtest package. And as an alternative to the previous method we can use the KRmodcomp function directly.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/">pbkrtest</a></span><span class="op">)</span></span>
+<span><span class="va">m0</span> <span class="op">=</span> <span class="fu">lme4</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer</a></span><span class="op">(</span><span class="va">atp</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">time</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">dog</span><span class="op">)</span>,</span>
+<span>                data <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/pbkrtest/man/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">m1</span>,<span class="va">m0</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div id="cardiac-enzyme---artifical-missing-data" class="section level3" number="3.2.2">
 <h3>
 <span class="header-section-number">3.2.2</span> Cardiac enzyme - Artifical missing data<a class="anchor" aria-label="anchor" href="#cardiac-enzyme---artifical-missing-data"><i class="fas fa-link"></i></a>
 </h3>
-<p>The results in the lower panel of of Table VII were computed by applying the same method to the same dataset but now with artificial missing data introduced.</p>
+<p>The results in the lower panel of Table VII are computed by applying the same method to the same dataset but now with artificial missing data introduced.</p>
 <p>The <code>Box_correction_modified_nlme()</code> function works with missing data.</p>
 <p>Below we give the R code to compute these results.</p>
 <p>We first introduce the missing data points to the <code>Cardiac_enzyme_data</code> used in the previous section.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Cardiac_enzyme_data_miss</span> <span class="op">=</span> <span class="va">Cardiac_enzyme_data</span></span>
 <span><span class="va">Cardiac_enzyme_data_miss</span><span class="op">$</span><span class="va">atp</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">Cardiac_enzyme_data_miss</span><span class="op">$</span><span class="va">dog</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="op">[</span><span class="fl">7</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span> <span class="op">=</span> <span class="cn">NA</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/">nlme</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/glsControl.html">glsControl</a></span><span class="op">(</span>tolerance <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">8</span><span class="op">)</span></span>
 <span></span>
@@ -236,27 +251,27 @@
 <span></span>
 <span><span class="fu">Box_correction_modified_nlme</span><span class="op">(</span>model <span class="op">=</span> <span class="va">model</span>, model_r <span class="op">=</span> <span class="va">model_r</span>, data <span class="op">=</span> <span class="va">Cardiac_enzyme_data_miss</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="guinea-pigs" class="section level3" number="3.2.3">
+<div id="Guinea-pigs" class="section level3" number="3.2.3">
 <h3>
-<span class="header-section-number">3.2.3</span> Guinea pigs<a class="anchor" aria-label="anchor" href="#guinea-pigs"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.2.3</span> Guinea pigs<a class="anchor" aria-label="anchor" href="#Guinea-pigs"><i class="fas fa-link"></i></a>
 </h3>
 <p>Importing the dataset.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Guinea_pigs_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="st">"Data_Images_Figures/brammer.csv"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">conc.f</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">conc.f</span><span class="op">)</span></span></code></pre></div>
-<p>For this example<span class="citation"><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;&lt;strong&gt;Skene_analysis_2010?&lt;/strong&gt;&lt;/p&gt;"><sup>3</sup></a></span> used the sample covariance matrix as an estimator of the covariance matrix (<span class="math inline">\(\Sigma\)</span>). Therefore the sample covariance estimates are computed and then are used as inputs for <code>Sigma</code> in the <code>Box_correction_modified_nlme()</code> function.</p>
+<p>For this example <span class="citation">Skene and Kenward<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></span> used the sample covariance matrix as an estimator of the covariance matrix (<span class="math inline">\(\Sigma\)</span>). Therefore the sample covariance estimates are computed and then are used as inputs for <code>Sigma</code> in the <code>Box_correction_modified_nlme()</code> function.</p>
 <p>Calculating the sample covariance matrices.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sigma_compound_1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">8</span><span class="op">:</span><span class="fl">14</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">15</span><span class="op">:</span><span class="fl">21</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sigma_compound_2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="fl">2</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">8</span><span class="op">:</span><span class="fl">14</span>,<span class="fl">2</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">15</span><span class="op">:</span><span class="fl">21</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">=</span> <span class="fl">3</span> <span class="co">#no. subjects</span></span>
 <span></span>
 <span><span class="va">sigma_compound_1_block</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/kronecker.html">%x%</a></span> <span class="va">sigma_compound_1</span></span>
 <span><span class="va">sigma_compound_2_block</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/kronecker.html">%x%</a></span> <span class="va">sigma_compound_2</span></span></code></pre></div>
 <p>Creating the models.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/">nlme</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model_AP1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span><span class="va">AP1</span><span class="op">~</span><span class="va">conc.f</span>,data<span class="op">=</span><span class="va">Guinea_pigs_data</span><span class="op">)</span></span>
@@ -268,12 +283,12 @@
 <ul>
 <li>For compound 1.</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Box_correction_modified_nlme</span><span class="op">(</span>model <span class="op">=</span> <span class="va">model_AP1</span>, model_r <span class="op">=</span> <span class="va">model_AP1_r</span>, data <span class="op">=</span> <span class="va">Guinea_pigs_data</span>, Sigma <span class="op">=</span> <span class="va">sigma_compound_1_block</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>For compound 2.</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Box_correction_modified_nlme</span><span class="op">(</span>model <span class="op">=</span> <span class="va">model_AP2</span>, model_r <span class="op">=</span> <span class="va">model_AP2_r</span>, data <span class="op">=</span> <span class="va">Guinea_pigs_data</span>, Sigma <span class="op">=</span> <span class="va">sigma_compound_2_block</span><span class="op">)</span></span></code></pre></div>
 
 </div>
@@ -281,7 +296,7 @@
 </div>
 
   <div class="chapter-nav">
-<div class="prev"><a href="modified-box-correction.html"><span class="header-section-number">2</span> Modified Box Correction</a></div>
+<div class="prev"><a href="Modified-Box-Correction-SAS.html"><span class="header-section-number">2</span> Modified Box Correction</a></div>
 <div class="next"><a href="references.html">References</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
@@ -290,17 +305,17 @@
 <li><a class="nav-link" href="#nlme"><span class="header-section-number">3.1</span> nlme</a></li>
 <li>
 <a class="nav-link" href="#examples"><span class="header-section-number">3.2</span> Examples</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#cardiac-enzyme"><span class="header-section-number">3.2.1</span> Cardiac enzyme</a></li>
+<li><a class="nav-link" href="#cardiac-enzyme-1"><span class="header-section-number">3.2.1</span> Cardiac enzyme</a></li>
 <li><a class="nav-link" href="#cardiac-enzyme---artifical-missing-data"><span class="header-section-number">3.2.2</span> Cardiac enzyme - Artifical missing data</a></li>
-<li><a class="nav-link" href="#guinea-pigs"><span class="header-section-number">3.2.3</span> Guinea pigs</a></li>
+<li><a class="nav-link" href="#Guinea-pigs"><span class="header-section-number">3.2.3</span> Guinea pigs</a></li>
 </ul>
 </li>
 </ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
-<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/02-mod_box_R.Rmd">View source <i class="fab fa-github"></i></a></li>
-          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/02-mod_box_R.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+<li><a id="book-source" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/blob/main/02-mod_box_R.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/edit/main/02-mod_box_R.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
         </ul>
 </div>
     </nav>
@@ -312,7 +327,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in (Skene &amp; Kenward, 2010)</strong>" was written by Dylan Dijk. It was last built on 2022-07-28.</p>
+    <p>"<strong>Methods in (Skene &amp; Kenward, 2010)</strong>" was written by Dylan Dijk. It was last built on 2022-08-22.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

@@ -1,3 +1,15 @@
+/* Trying to import dataset from url */
+
+filename cardiac url "https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/The%20Cardiac%20Enzyme%20Data%20-%20Reduced%20Data%20set.csv";
+
+
+proc import file=cardiac out=cardiac_data dbms=csv;
+run;
+
+proc print data=cardiac_data;
+run;
+
+/* Alternative importing from local */
 
 proc import datafile="S:\Shared_Projects\RO06_Surrey_CTU_Statistics\Dylan\Small samples\R code\Mixed-Models-Small-Sample-Tutorial-bs4\Data_Images_Figures\The Cardiac Enzyme Data - Reduced Data set.csv"
         out=cardiac_data
