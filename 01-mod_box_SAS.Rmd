@@ -1,4 +1,4 @@
-# (PART\*) SAS {.unnumbered}
+# (PART\*) SAS {.unnumbered} 
 
 
 # Modified Box Correction {#Modified-Box-Correction-SAS}
@@ -7,14 +7,14 @@
 
 ### Cardiac enzyme
 
-To show how to calculate the modified box corrected F statistic with mixed models in SAS, we present the code used by Simon Skene to calculate the results for example 6.1 in the second paper^[@skene_analysis_2010_II].
+To show how to calculate the modified Box corrected $F$-statistic in SAS, we present the code used by Simon Skene to calculate the results for example 6.1 in paper II.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = FALSE)
 ```
 
 
-To reproduce the examples in the paper we need to import the datasets that were used. Alongside this tutorial we have a GitHub repository that contains a [folder](https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/tree/main/Data_Images_Figures "GitHub folder with datasets") with the **datasets** used in the paper  so they can be easily downloaded.
+To reproduce the examples in the paper we need to import the datasets that were used. Alongside this tutorial we have a GitHub repository that contains a [folder](https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/tree/main/Data_Images_Figures "GitHub folder with datasets") with the datasets used in the paper so they can be easily downloaded.
 
 ***
 
@@ -29,7 +29,7 @@ run;
 
 Next we need to create the mixed model. For this example we had no random effects and therefore do not include a `random` statement, however we have an unstructured covariance matrix and we can define this is using the `repeated` statement.
 
-```{sas, eval = FALSE}
+```{sas, engine.path = "C:\\Program Files\\SASHome\\SASFoundation\\9.4\\sas.exe", eval = FALSE}
 proc mixed data=cardiac_data;
 class dog trt time;
 model atp=trt time trt*time/ ddfm=kr s;
@@ -38,7 +38,7 @@ run;
 ```
 
 
-```{sas}
+```{sas, engine.path = "C:\\Program Files\\SASHome\\SASFoundation\\9.4\\sas.exe"}
 title2 "Inference Using Box Corrections";
 
 proc iml;

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 5 Scheffé’s method | Methods in (Skene &amp; Kenward, 2010)</title>
+<meta name="author" content="Dylan Dijk">
+<meta name="description" content="5.1 Code The code below gives an R function that uses Scheffé’s method with the modified Box corrected statistic to calculate the confidence intervals for individual contrasts within a categorical...">
+<meta name="generator" content="bookdown 0.27 with bs4_book()">
+<meta property="og:title" content="Chapter 5 Scheffé’s method | Methods in (Skene &amp; Kenward, 2010)">
+<meta property="og:type" content="book">
+<meta property="og:description" content="5.1 Code The code below gives an R function that uses Scheffé’s method with the modified Box corrected statistic to calculate the confidence intervals for individual contrasts within a categorical...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 5 Scheffé’s method | Methods in (Skene &amp; Kenward, 2010)">
+<meta name="twitter:description" content="5.1 Code The code below gives an R function that uses Scheffé’s method with the modified Box corrected statistic to calculate the confidence intervals for individual contrasts within a categorical...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Methods in (Skene &amp; Kenward, 2010)</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li class="book-part">SAS</li>
+<li><a class="" href="Modified-Box-Correction-SAS.html"><span class="header-section-number">2</span> Modified Box Correction</a></li>
+<li class="book-part">R</li>
+<li><a class="" href="Sandwich-Estimator.html"><span class="header-section-number">3</span> Sandwich Estimator</a></li>
+<li><a class="" href="Modified-Box-Correction.html"><span class="header-section-number">4</span> Modified Box Correction</a></li>
+<li><a class="active" href="Scheffe-method.html"><span class="header-section-number">5</span> Scheffé’s method</a></li>
+<li><a class="" href="References.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="Scheffe-method" class="section level1" number="5">
+<h1>
+<span class="header-section-number">5</span> Scheffé’s method<a class="anchor" aria-label="anchor" href="#Scheffe-method"><i class="fas fa-link"></i></a>
+</h1>
+<div id="code" class="section level2" number="5.1">
+<h2>
+<span class="header-section-number">5.1</span> Code<a class="anchor" aria-label="anchor" href="#code"><i class="fas fa-link"></i></a>
+</h2>
+<p>The code below gives an R function that uses Scheffé’s method with the modified Box corrected statistic to calculate the confidence intervals for individual contrasts within a categorical effect.
+To use this <code>Scheffe()</code> function we require the <code>Box_correction_modified_nlme()</code> function to be in our R environment.</p>
+<p>The <code>Scheffe()</code> function requires the input variables <code>model</code> and <code>model_r</code>, in the same way it is used for the <code>Box_correction_modified_nlme()</code> function. However, as we are looking at contrasts within an individual categorical variable <code>model_r</code> should only have a single categorical variable removed relative to the formula selected by <code>model</code>. For instance, in the <a href="Scheffe-method.html#Scheffe-Guinea-pig-example">example below</a> <code>model_r</code> has the categorical variable <code>conc.f</code> removed.</p>
+<p>This function has an input variable <code>a</code> which is used to select the contrasts that we want to calculate confidence intervals for. Equation (22) in paper II shows how this <span class="math inline">\(a\)</span> vector is used to define the contrasts.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Scheffe</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">model_r</span>, <span class="va">data</span>, <span class="va">Sigma</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">a</span>, <span class="va">subjects</span><span class="op">)</span><span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="va">x</span> <span class="op">=</span> <span class="fu">Box_correction_modified_nlme</span><span class="op">(</span><span class="va">model</span>, <span class="va">model_r</span>, <span class="va">data</span>, <span class="va">Sigma</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="va">C_a</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">fixed_effects_estimate</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">fixed_effects_estimate</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,<span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">a</span><span class="op">)</span></span>
+<span><span class="va">sigma_2</span> <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html">%*%</a></span> <span class="va">x</span><span class="op">$</span><span class="va">A</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html">%*%</a></span> <span class="va">x</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">n</span><span class="op">-</span><span class="va">x</span><span class="op">$</span><span class="va">r</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cat_var_removed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">terms</span>, <span class="st">"term.labels"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">model_r</span><span class="op">$</span><span class="va">terms</span>, <span class="st">"term.labels"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n_i</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html">nlevels</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="va">cat_var_removed</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">n_i</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">[[</span><span class="va">cat_var_removed</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="va">cat_var_removed</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,<span class="va">cat_var_removed</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">S_Ca</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">sigma_2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">a</span><span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="va">n_i</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">S_alpha_a</span> <span class="op">=</span> <span class="va">S_Ca</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">c</span> <span class="op">*</span> <span class="va">x</span><span class="op">$</span><span class="va">Lambda</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">qf</a></span><span class="op">(</span><span class="fl">0.95</span>,<span class="va">x</span><span class="op">$</span><span class="va">c</span>,<span class="va">x</span><span class="op">$</span><span class="va">v2_mod</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"C_a"</span> <span class="op">=</span> <span class="va">C_a</span>, <span class="st">"Conf_interval"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"("</span>,<span class="va">C_a</span> <span class="op">-</span> <span class="va">S_alpha_a</span>,<span class="st">", "</span>, <span class="va">C_a</span> <span class="op">+</span> <span class="va">S_alpha_a</span>, <span class="st">")"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="Scheffe-Guinea-pig-example" class="section level2" number="5.2">
+<h2>
+<span class="header-section-number">5.2</span> Example<a class="anchor" aria-label="anchor" href="#Scheffe-Guinea-pig-example"><i class="fas fa-link"></i></a>
+</h2>
+<p>We have already shown the calculation of the modified box corrected statistic for the guinea pig example in subsection <a href="Modified-Box-Correction.html#Guinea-pigs">4.2.3</a>. We now extend this to calculate the confidence intervals given in Table X of paper II.</p>
+<p>The setup before we run the <code>Scheffe()</code> function to get the confidence intervals is identical to the setup in subsection <a href="Modified-Box-Correction.html#Guinea-pigs">4.2.3</a>.</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Guinea_pigs_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/brammer.csv"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">conc.f</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">conc.f</span><span class="op">)</span></span>
+<span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">gpig.f</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">gpig.f</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/">nlme</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model_AP1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span><span class="va">AP1</span><span class="op">~</span><span class="va">conc.f</span>,data<span class="op">=</span><span class="va">Guinea_pigs_data</span><span class="op">)</span></span>
+<span><span class="va">model_AP1_r</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span><span class="va">AP1</span><span class="op">~</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">Guinea_pigs_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model_AP2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span><span class="va">AP2</span><span class="op">~</span><span class="va">conc.f</span>,data<span class="op">=</span><span class="va">Guinea_pigs_data</span><span class="op">)</span></span>
+<span><span class="va">model_AP2_r</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html">gls</a></span><span class="op">(</span><span class="va">AP2</span><span class="op">~</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">Guinea_pigs_data</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sigma_compound_1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="st">"AP1"</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">8</span><span class="op">:</span><span class="fl">14</span>,<span class="st">"AP1"</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">15</span><span class="op">:</span><span class="fl">21</span>,<span class="st">"AP1"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sigma_compound_2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="st">"AP2"</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">8</span><span class="op">:</span><span class="fl">14</span>,<span class="st">"AP2"</span><span class="op">]</span>,<span class="va">Guinea_pigs_data</span><span class="op">[</span><span class="fl">15</span><span class="op">:</span><span class="fl">21</span>,<span class="st">"AP2"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">number_of_subjects</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nlevels.html">nlevels</a></span><span class="op">(</span><span class="va">Guinea_pigs_data</span><span class="op">$</span><span class="va">gpig.f</span><span class="op">)</span> <span class="co">#number of subjects</span></span>
+<span></span>
+<span><span class="va">sigma_compound_1_block</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">number_of_subjects</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/kronecker.html">%x%</a></span> <span class="va">sigma_compound_1</span></span>
+<span><span class="va">sigma_compound_2_block</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">number_of_subjects</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/kronecker.html">%x%</a></span> <span class="va">sigma_compound_2</span></span></code></pre></div>
+<p>The choice of <code>a</code> and the contrasts we want to look at is based on the ordering of the levels of the categorical variable.
+Therefore if we want to compute the confidence interval for the mean difference between the control measure and the first concentration, we set <code>a = c(-1,1,0,0,0,0,0)</code>.</p>
+<p>For compound 1, we get these values:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Scheffe_comp_1</span> <span class="op">=</span> </span>
+<span><span class="fu">Scheffe</span><span class="op">(</span>model <span class="op">=</span> <span class="va">model_AP1</span>, model_r <span class="op">=</span> <span class="va">model_AP1_r</span>, data <span class="op">=</span> <span class="va">Guinea_pigs_data</span>, Sigma <span class="op">=</span> <span class="va">sigma_compound_1_block</span>, a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span>, subjects <span class="op">=</span> <span class="st">"gpig.f"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="Scheffe-method.html#cb38-1" aria-hidden="true" tabindex="-1"></a>Scheffe_comp_1<span class="sc">$</span>Conf_interval</span>
+<span id="cb38-2"><a href="Scheffe-method.html#cb38-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">"(-3.07944941452269, 5.74611608118969)"</span></span></code></pre></div>
+<!-- ```{r, echo=FALSE, results='markup'} -->
+<!-- Scheffe_comp_2 =  -->
+<!-- Scheffe(model = model_AP2, model_r = model_AP2_r, data = Guinea_pigs_data, Sigma = sigma_compound_2_block, a = c(-1,1,0,0,0,0,0)) -->
+<!-- ```    -->
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="Modified-Box-Correction.html"><span class="header-section-number">4</span> Modified Box Correction</a></div>
+<div class="next"><a href="References.html">References</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#Scheffe-method"><span class="header-section-number">5</span> Scheffé’s method</a></li>
+<li><a class="nav-link" href="#code"><span class="header-section-number">5.1</span> Code</a></li>
+<li><a class="nav-link" href="#Scheffe-Guinea-pig-example"><span class="header-section-number">5.2</span> Example</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/blob/main/04-scheffe_R.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/edit/main/04-scheffe_R.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Methods in (Skene &amp; Kenward, 2010)</strong>" was written by Dylan Dijk. It was last built on 2022-09-09.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

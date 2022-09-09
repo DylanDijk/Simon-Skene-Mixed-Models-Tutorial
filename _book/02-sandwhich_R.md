@@ -1,0 +1,253 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# (PART\*) R {.unnumbered}
+
+
+
+
+# Sandwich Estimator {#Sandwich-Estimator}
+
+## Sandwich Estimator - R Function
+
+<!-- The sandwich estimator unlike the modified Box correction does not use a REML estimate. Therefore we do not need to use a package for mixed models such as **lme4** or **nlme**. -->
+
+The code below gives an R function that returns the estimate of $\beta$ using the GEE approach (denoted as $\hat\beta_W$ in paper I) under the setup of a multivariate linear model as described by equation \@ref(eq:general-model). The function also returns the sandwich estimator for the covariance matrix of the estimate of $\beta$. 
+
+To use this function you need to copy the code (can click on clipboard symbol on top right corner of code chunk) and run it in R so that it is in your R environment. How to use this function is then illustrated by an example.
+
+This `sandwich_estimator()` function takes four inputs: `model`, `subjects`, `data` and `W`. The `model` is used to describe the mean model and takes the same form as you would give a formula in `lm()`. The `subjects` variable is used to identify the variable in the data that labels the subjects. `W` is then used to set the working covariance matrix. In paper II the working covariance matrix is denoted as ($W^{-1}$).
+
+
+```r
+library(Matrix)
+
+sandwich_estimator = function(model, subjects, data, W = NA){
+  
+  model_formula = as.formula(model)
+  
+  X = model.matrix(model_formula, data = data)
+  full_model_frame = model.frame(model_formula, data = data)
+  Y = model.response(full_model_frame)
+  
+if(is.na(W)){
+  W = diag(1, nrow = nrow(X))
+}
+  
+beta_W = solve(t(X)%*%solve(W)%*%X)%*%t(X)%*%solve(W)%*%Y
+  
+  
+  sigma_i_comb = list()
+  for(i in levels(data[[paste(subjects)]])){
+    
+    Y_i = Y[data[[subjects]] == i]
+    X_i = X[data[[subjects]] == i,]
+    sigma_i = (Y_i - (X_i %*% beta_W))
+    sigma_i = sigma_i[,1]
+    sigma_i = sigma_i %*% t(sigma_i)
+    
+    sigma_i_comb[[paste(i)]] = sigma_i
+  }
+  
+  sigma = bdiag(sigma_i_comb)
+  V_s = solve(t(X)%*%solve(W)%*%X)%*%t(X)%*%solve(W)%*%sigma%*%t(solve(t(X)%*%solve(W)%*%X)%*%t(X)%*%solve(W))
+  
+  return(list("beta_W" = beta_W, "V_s" = V_s, "sigma_i_comb" = sigma_i_comb))
+  
+}
+```
+
+## Wald Test using Sandwich Estimator - R Function
+
+This `sandwich_estimator_p_value()` function carries out a Wald test using the sandwich estimate outputted from the `sandwich_estimator()` function, therefore both functions need to be in your R environment.
+
+This function has an additional `model_r` variable, and you should assign to it a formula with the variables removed that you want to test for significance for in the full model defined in the `model` variable.
+
+
+```r
+sandwich_estimator_p_value = function(model, model_r, subjects, data, W = NA){
+  
+  sand_estimate = sandwich_estimator(model = model, subjects = subjects, data = data, W = W)
+
+  Beta_r_names =
+    colnames(model.matrix(model, data = data))[!(colnames(model.matrix(model, data = data)) %in%
+  colnames(model.matrix(model_r, data = data)))]
+
+  Beta_r = sand_estimate$beta_W[Beta_r_names,]
+  
+  Wald_sand_stat = (Beta_r %*% solve(sand_estimate$V_s[Beta_r_names,Beta_r_names]) %*% t(t(Beta_r)))[1]
+  Wald_sand_stat_p_value = pchisq(q = Wald_sand_stat, df = length(Beta_r), lower.tail = FALSE)
+  
+return(list("Wald_sand_stat" = Wald_sand_stat, "Wald_sand_stat_p_value" = Wald_sand_stat_p_value, "Beta_r" = Beta_r))
+  
+}
+```
+
+
+***
+
+
+### Example - Cardiac Enzyme Dataset {#Sandwich-Cardiac-Enzyme-Example}
+
+In this example we look at the same dataset and mean model that was used in the example covered in Section 6.1 of paper II. We apply the `sandwich_estimator()` function to output the sandwich estimator of the covariance matrix of the estimated fixed effects. Then use the `sandwich_estimator_p_value()` to test for the inclusion of the interaction term between treatment and time in the model.
+
+
+First of all we need to import the dataset. The code below imports the dataset from a GitHub repository, and converts a selection of the variables in the dataset to factors.
+
+
+```r
+Cardiac_enzyme_data = read.csv("https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/The%20Cardiac%20Enzyme%20Data%20-%20Reduced%20Data%20set.csv")
+Cardiac_enzyme_data$dog = as.factor(Cardiac_enzyme_data$dog)
+Cardiac_enzyme_data$trt = as.factor(Cardiac_enzyme_data$trt)
+Cardiac_enzyme_data$time = as.factor(Cardiac_enzyme_data$time)
+```
+
+The code below runs the `sandwich_estimator` function:
+
+
+```r
+Cardiac_enzyme_sandwich_estimate = 
+  sandwich_estimator(model = atp ~  trt + time + trt:time,
+                     subjects = "dog", data = Cardiac_enzyme_data)
+```
+
+After running this function we can then extract the estimate of $\beta$ (`beta_W`) and the sandwich estimate of $\Sigma$ (`V_s`).
+
+
+```r
+Cardiac_enzyme_sandwich_estimate$beta_W
+Cardiac_enzyme_sandwich_estimate$V_s
+```
+
+The code below runs the `sandwich_estimator_p_value()` function:
+
+
+```r
+Cardiac_enzyme_sandwich_wald_p_value = 
+sandwich_estimator_p_value(model = atp ~ trt + time + trt:time,
+                           model_r = atp ~ trt + time, 
+                           data = Cardiac_enzyme_data, subjects = "dog")
+```
+
+And we get the following p-value:
+
+```r
+Cardiac_enzyme_sandwich_wald_p_value$Wald_sand_stat_p_value
+[1] 1.02213e-55
+```
+
+***
+
+## Adjusted Sandwich Estimator
+
+The `adj_sandwich_estimator()` function below computes the Wald $F$-statistic as described in Section 3 of paper I. The function uses the sandwich estimator computed by the `sandwich_estimator()` function and therefore requires both of the previous functions to be in your R environment.
+
+This function has the same input variables as the `adj_sandwich_estimator_p_value()` function.
+
+
+```r
+adj_sandwich_estimator = function(model, model_r, subjects, data, W = NA){
+  
+  sand_estimate = sandwich_estimator(model = model, subjects = subjects, data = data)
+  
+  sand_stat = sandwich_estimator_p_value(model = model, model_r = model_r, subjects = subjects, data = data)
+  
+  l = length(sand_stat$Beta_r)
+
+K = list(length = l^2)
+
+for(i in 1:l^2){
+  
+          vec = rep(0, l^2)
+
+  if(((i - 1) %% (l + 1)) == 0){
+    
+      for(j in 1:l^2){
+      
+        if(((j - 1)) %% (l + 1) == 0){
+          vec[j] = 1
+          
+        }
+      }  
+    }
+
+     K[[i]] =  vec     
+          
+}
+
+Beta_r_names = names(sand_stat$Beta_r)
+
+K = do.call(rbind, K)
+omega_hat = (diag(l^2) + K) %*% 
+  (sand_estimate$V_s[Beta_r_names, Beta_r_names] %x%
+    sand_estimate$V_s[Beta_r_names, Beta_r_names]
+  )
+
+X = model.matrix(model, data = data)
+
+if(is.na(W)){
+W = diag(1, nrow = nrow(X))
+}
+
+mod_based_est = solve(t(X) %*% solve(W) %*% X)
+
+P_i = list()
+ for(i in levels(data[[subjects]])){
+    
+    X_i = X[data[[subjects]] == i,]
+    P_i[[i]] =
+      c(
+    t(X_i) %*% W[data[[subjects]] == i,data[[subjects]] == i] %*% sand_estimate$sigma_i_comb[[i]] %*%
+    W[data[[subjects]] == i,data[[subjects]] == i] %*% X_i
+      )
+  }
+
+n = nrow(data)
+
+P_hat = Reduce("+", P_i)/n
+
+P_i_minus_P_hat = lapply(P_i, function(x){x - P_hat})
+
+T_hat = Reduce("+",lapply(P_i_minus_P_hat, function(x){x %*% t(x)}))/(n*(n-1))
+
+psi_hat = n^2 * (mod_based_est[Beta_r_names,] %x% mod_based_est[Beta_r_names,]) %*%
+             T_hat %*% t(mod_based_est[Beta_r_names,] %x% mod_based_est[Beta_r_names,])
+
+v = sum(diag(psi_hat %*% omega_hat))/sum(diag(psi_hat %*% psi_hat))
+
+F_Wald_adj_sand = (v - l + l)/(v * l) * sand_stat$Wald_sand_stat
+  
+F_Wald_adj_sand_p = pf(df1 = l, df2 = v - l +1, q = F_Wald_adj_sand, lower.tail = FALSE)
+
+return(list("F_Wald_adj_sand" = F_Wald_adj_sand,
+            "F_Wald_adj_sand_p" = F_Wald_adj_sand_p))
+
+}
+```
+
+### Example
+
+This example is analogue to the calculation of the p-value in subsection \@ref(Sandwich-Cardiac-Enzyme-Example). 
+
+
+```r
+Cardiac_enzyme_adj_sandwich_wald_p_value = 
+adj_sandwich_estimator(model = atp ~ trt + time + trt:time,
+                           model_r = atp ~ trt + time, 
+                           data = Cardiac_enzyme_data, subjects = "dog")
+```
+
+We get the following Wald $F$-statistic and p-value:
+
+
+```r
+Cardiac_enzyme_adj_sandwich_wald_p_value$F_Wald_adj_sand
+[1] 34.91697
+Cardiac_enzyme_adj_sandwich_wald_p_value$F_Wald_adj_sand_p
+[1] 0.1325053
+```
+
+

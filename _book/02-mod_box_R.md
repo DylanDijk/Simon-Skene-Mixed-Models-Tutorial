@@ -15,7 +15,7 @@ The function takes as input two **nlme** models, the input variable `model` is t
 
 ```r
 
-Box_correction_modified_nlme = function(model, model_r, data, Sigma = NULL){
+Box_correction_modified_nlme = function(model, model_r, data, Sigma = NULL, print = TRUE){
   
   
   
@@ -23,10 +23,10 @@ Box_correction_modified_nlme = function(model, model_r, data, Sigma = NULL){
   X <- model.matrix(model,data = data)
   
   ind = which(is.na(match(rownames(data),rownames(X))))
-
+  
   # Response variable vector
   Y = getResponse(model)
-
+  
   
   # Design matrix for model with removed variables
   X_r <- model.matrix(model_r,data = data)
@@ -36,32 +36,32 @@ Box_correction_modified_nlme = function(model, model_r, data, Sigma = NULL){
   parm = ncol(X)
   # Number of variables being removed
   c = ncol(X)-ncol(X_r)
-
-
+  
+  
   # Have added option for Sigma to be chosen manually, this is needed for the Guinea pig example.
   # By default the function takes Sigma to be NULL, so will be NULL unless manually defined.
   
   if(is.null(Sigma)){
-  
-      # Need to find good way of extracting covariance matrix from model
-        # Put in if statement to deal with models with no correlated errors
-      if(is.null(model$modelStruct$corStruct)){
-        
-        Sigma = diag((model$sigma)^2, nrow = n, ncol = n)
+    
+    # Need to find good way of extracting covariance matrix from model
+    # Put in if statement to deal with models with no correlated errors
+    if(is.null(model$modelStruct$corStruct)){
       
-      } else {
-        # repeats = as.numeric(levels(model$groups))
-        
-        # Creating block matrix for model with correlated errors
-        Sigma = getVarCov(model, type = "marginal")
-        Sigma = diag(nlevels(model$groups)) %x% Sigma
-          if(!(length(ind) == 0)){
-            Sigma = Sigma[-ind,-ind]
-          }
-        }
-     
+      Sigma = diag((model$sigma)^2, nrow = n, ncol = n)
+      
+    } else {
+      # repeats = as.numeric(levels(model$groups))
+      
+      # Creating block matrix for model with correlated errors
+      Sigma = getVarCov(model, type = "marginal")
+      Sigma = diag(nlevels(model$groups)) %x% Sigma
+      if(!(length(ind) == 0)){
+        Sigma = Sigma[-ind,-ind]
+      }
     }
-     
+    
+  }
+  
   
   A = diag(n) - ( X %*% solve( t(X) %*% X ) %*% t(X) )
   B = ( X %*% solve( t(X) %*% X ) %*% t(X) )  -  ( X_r %*% solve( t(X_r) %*% X_r ) %*% t(X_r) ) 
@@ -84,14 +84,21 @@ Box_correction_modified_nlme = function(model, model_r, data, Sigma = NULL){
   
   p_value = pf(df1 = c, df2 = v_2, q =  F_mod, lower.tail = F)
   
-  values = c(lambda, F_, F_mod, c, v_2, p_value)
-  names(values) = c("Lambda", "F_","F_MOD", "v1_MOD", "v2_mod", "prob_F_mod")
+  values = c(lambda, F_, c, v_2, F_mod, p_value)
+  names(values) = c("Lambda", "F_", "v1_MOD", "v2_mod","F_MOD", "prob_F_mod")
   values = round(values, digits = 3)
   
-  return(as.table(values))
+  if(print){
+    print(as.table(values))
+  }
+  
+  fixed_effects_estimate = solve(t(X)%*%X)%*%t(X)%*%Y
+  
+  return(list("Lambda" = lambda, "F_" = F_, "c" = c, "v2_mod" = v_2, "F_MOD" = F_mod,       
+              "prob_F_mod" = p_value, "A" = A, "B" = B, "n" = n, "r" = parm, "Y" = Y,
+              "fixed_effects_estimate" = fixed_effects_estimate))
   
 }
-
 ```
 
 
@@ -101,11 +108,11 @@ Next we give some examples of using the function to recreate results presented i
 
 ## Examples
 
-In this section we look at recreating the examples given in section 6 of the second paper. 
+In this section we look at recreating the examples given in section 6 of paper II. 
 
 ### Cardiac enzyme
 
-This example is covered in Section 6.1 of the second  paper^[@skene_analysis_2010_II]. Section 6.1 of the paper applies the modified Box correction twice to this dataset, once with the original versiona and after including artificial dropouts to the dataset.
+This example is covered in Section 6.1 of the second  paper^[@skene_analysis_2010_II]. Section 6.1 of the paper applies the modified Box correction twice to this dataset, once with the original version and after including artificial dropouts to the dataset.
 
 Importing the dataset from GitHub repository, and converting a selection of variables to factors.
 
@@ -138,7 +145,7 @@ model_r = gls(model = atp ~ trt + time,
 
 
 
-We can compare the results from the `Box_correction_modified_nlme()` function results given in the upper panel of Table VII in the second paper. 
+We can compare the results from the `Box_correction_modified_nlme()` function results given in the upper panel of Table VII in paper II. 
 
 
 ```r
@@ -171,7 +178,6 @@ library(pbkrtest)
 m0 = lme4::lmer(atp ~ trt + time + (1|dog),
                 data = Cardiac_enzyme_data)
 KRmodcomp(m1,m0)
-
 ```
 
 
@@ -213,28 +219,42 @@ model_r = gls(model = atp ~ trt + time,
 Box_correction_modified_nlme(model = model, model_r = model_r, data = Cardiac_enzyme_data_miss)
 ```
 
+***
+
 ### Guinea pigs {#Guinea-pigs}
 
-Importing the dataset.
+In this example we use a dataset that shows the amplitude of action potential that was measured from pieces of heart dissected from guinea pigs. The measurements were taken after being exposed to two different compounds, therefore we have two response variables AP1 and AP2.
+
+Each piece of tissue had a control measure where no compound was given and then six increasing concentrations of the compound. This was carried out on three guinea pigs' hearts, so we have seven repeated measurements from just three participants. 
+
+The code below imports the dataset.
 
 
 ```r
-Guinea_pigs_data = read.csv("Data_Images_Figures/brammer.csv")
-
-Guinea_pigs_data$conc.f = factor(Guinea_pigs_data$conc.f)
-
+Guinea_pigs_data = read.csv("https://raw.githubusercontent.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/main/Data_Images_Figures/brammer.csv")
 ```
 
-For this example @skene_analysis_2010_II used the sample covariance matrix as an estimator of the covariance matrix ($\Sigma$). Therefore the sample covariance estimates are computed and then are used as inputs for `Sigma` in the `Box_correction_modified_nlme()` function.
+We also need to make sure that the concentration variable is stored as a factor variable:
+
+```r
+Guinea_pigs_data$conc.f = factor(Guinea_pigs_data$conc.f)
+```
 
 
-Calculating the sample covariance matrices.
+In this example the experiments are treated as simple repeated measures designs with concentration as the time variable and tissue as the subject. 
+
+Due to the small number of samples the estimation method for the unstructured covariance models did not converge therefore for this example @skene_analysis_2010_II used the sample covariance matrix as an estimator of the covariance matrix ($\Sigma$).
+
+The code below computes the sample covariance estimates which are then used as inputs for `Sigma` in the `Box_correction_modified_nlme()` function.
+
+First we calculate the sample covariance matrices.
 
 ```r
 sigma_compound_1 = cov(rbind(Guinea_pigs_data[1:7,1],Guinea_pigs_data[8:14,1],Guinea_pigs_data[15:21,1]))
 sigma_compound_2 = cov(rbind(Guinea_pigs_data[1:7,2],Guinea_pigs_data[8:14,2],Guinea_pigs_data[15:21,2]))
 ```
 
+Next we create the blocked version of these covariance matrices, a block for each of the three subjects.
 
 
 ```r
@@ -246,7 +266,7 @@ sigma_compound_2_block = diag(m) %x% sigma_compound_2
 ```
 
 
-Creating the models.
+Next we create the models. We make a model for each of the response variables with concentration (`conc.f`) as the only covariate.
 
 ```r
 library(nlme)
@@ -260,18 +280,34 @@ model_AP2_r = gls(AP2~1,data=Guinea_pigs_data)
 
 
 
-Running the `Box_correction_modified_nlme()` function. 
+Below we run the `Box_correction_modified_nlme()` function, using the objects we have created above as inputs. 
 
   * For compound 1.
 
 ```r
 Box_correction_modified_nlme(model = model_AP1, model_r = model_AP1_r, data = Guinea_pigs_data, Sigma = sigma_compound_1_block)
 ```
+This gives the following output, can see that we have a p-value of 0.057.
+
+```
+    Lambda         F_     v1_MOD     v2_mod      F_MOD 
+     0.113      0.509      6.000      5.176      4.498 
+prob_F_mod 
+     0.057 
+```
   * For compound 2.
 
 ```r
 Box_correction_modified_nlme(model = model_AP2, model_r = model_AP2_r, data = Guinea_pigs_data, Sigma = sigma_compound_2_block)
 ```
-  
+For compound 2, we get these values:
+
+```
+    Lambda         F_     v1_MOD     v2_mod      F_MOD 
+     0.043      0.895      6.000      5.086     20.847 
+prob_F_mod 
+     0.002 
+```
+
 
 

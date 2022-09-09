@@ -1,4 +1,4 @@
-# (PART\*) SAS {.unnumbered}
+# (PART\*) SAS {.unnumbered} 
 
 
 # Modified Box Correction {#Modified-Box-Correction-SAS}
@@ -7,12 +7,12 @@
 
 ### Cardiac enzyme
 
-To show how to calculate the modified box corrected F statistic with mixed models in SAS, we present the code used by Simon Skene to calculate the results for example 6.1 in the second paper^[@skene_analysis_2010_II].
+To show how to calculate the modified Box corrected $F$-statistic in SAS, we present the code used by Simon Skene to calculate the results for example 6.1 in paper II.
 
 
 
 
-To reproduce the examples in the paper we need to import the datasets that were used. Alongside this tutorial we have a GitHub repository that contains a [folder](https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/tree/main/Data_Images_Figures "GitHub folder with datasets") with the **datasets** used in the paper  so they can be easily downloaded.
+To reproduce the examples in the paper we need to import the datasets that were used. Alongside this tutorial we have a GitHub repository that contains a [folder](https://github.com/DylanDijk/Simon-Skene-Mixed-Models-Tutorial/tree/main/Data_Images_Figures "GitHub folder with datasets") with the datasets used in the paper so they can be easily downloaded.
 
 ***
 

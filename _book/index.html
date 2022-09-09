@@ -75,8 +75,10 @@ set in the _output.yml file.&lt;/p&gt;">
 <li class="book-part">SAS</li>
 <li><a class="" href="Modified-Box-Correction-SAS.html"><span class="header-section-number">2</span> Modified Box Correction</a></li>
 <li class="book-part">R</li>
-<li><a class="" href="modified-box-correction-1.html"><span class="header-section-number">3</span> Modified Box Correction</a></li>
-<li><a class="" href="references.html">References</a></li>
+<li><a class="" href="Sandwich-Estimator.html"><span class="header-section-number">3</span> Sandwich Estimator</a></li>
+<li><a class="" href="Modified-Box-Correction.html"><span class="header-section-number">4</span> Modified Box Correction</a></li>
+<li><a class="" href="Scheffe-method.html"><span class="header-section-number">5</span> Scheffé’s method</a></li>
+<li><a class="" href="References.html">References</a></li>
 </ul>
 
         <div class="book-extra">
@@ -88,29 +90,47 @@ set in the _output.yml file.&lt;/p&gt;">
 <h1>
 <span class="header-section-number">1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
 </h1>
-<p>This tutorial aims to show how methods described in the two papers by <span class="citation">Simon S. Skene and Michael G. Kenward<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;&lt;span&gt;“The Analysis of Very Small Samples of Repeated Measurements &lt;span&gt;I&lt;/span&gt;: &lt;span&gt;An&lt;/span&gt; Adjusted Sandwich Estimator,”&lt;/span&gt; &lt;em&gt;Statistics in Medicine&lt;/em&gt; 29, no. 27 (November 2010): 2825–37, &lt;a href="https://doi.org/10.1002/sim.4073" role="doc-biblioref"&gt;https://doi.org/10.1002/sim.4073&lt;/a&gt;.&lt;/p&gt;'><sup>1</sup></a></span><sup>,</sup><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;&lt;span class="citation"&gt;Simon S. Skene and Michael G. Kenward, &lt;span&gt;“The Analysis of Very Small Samples of Repeated Measurements &lt;span&gt;II&lt;/span&gt;: &lt;span&gt;A&lt;/span&gt; Modified &lt;span&gt;Box&lt;/span&gt; Correction,”&lt;/span&gt; &lt;em&gt;Statistics in Medicine&lt;/em&gt; 29, no. 27 (November 2010): 2838–56, &lt;a href="https://onlinelibrary.wiley.com/doi/10.1002/sim.4072" role="doc-biblioref"&gt;https://onlinelibrary.wiley.com/doi/10.1002/sim.4072&lt;/a&gt;.&lt;/span&gt;&lt;/p&gt;'><sup>2</sup></a> can be applied with mixed models in <a href="#R">R</a> or in <a href="#SAS">SAS</a>. For the rest of this tutorial we will refer to these two papers as paper I and paper II respectively.</p>
-<div id="in-particular-we-will-focus-on" class="section level2" number="1.1">
+<p>This tutorial aims to show how methods described in the <a href="References.html#References">two papers</a> by <span class="citation">Simon S. Skene and Michael G. Kenward<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;&lt;span&gt;“The Analysis of Very Small Samples of Repeated Measurements &lt;span&gt;I&lt;/span&gt;: &lt;span&gt;An&lt;/span&gt; Adjusted Sandwich Estimator,”&lt;/span&gt; &lt;em&gt;Statistics in Medicine&lt;/em&gt; 29, no. 27 (November 2010): 2825–37, &lt;a href="https://doi.org/10.1002/sim.4073" role="doc-biblioref"&gt;https://doi.org/10.1002/sim.4073&lt;/a&gt;.&lt;/p&gt;'><sup>1</sup></a></span><sup>,</sup><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;&lt;span class="citation"&gt;Simon S. Skene and Michael G. Kenward, &lt;span&gt;“The Analysis of Very Small Samples of Repeated Measurements &lt;span&gt;II&lt;/span&gt;: &lt;span&gt;A&lt;/span&gt; Modified &lt;span&gt;Box&lt;/span&gt; Correction,”&lt;/span&gt; &lt;em&gt;Statistics in Medicine&lt;/em&gt; 29, no. 27 (November 2010): 2838–56, &lt;a href="https://onlinelibrary.wiley.com/doi/10.1002/sim.4072" role="doc-biblioref"&gt;https://onlinelibrary.wiley.com/doi/10.1002/sim.4072&lt;/a&gt;.&lt;/span&gt;&lt;/p&gt;'><sup>2</sup></a> (paper I and paper II) can be applied in <a href="index.html#R-Intro">R</a>.</p>
+<!-- For the rest of this tutorial we will refer to these two papers as paper I and paper II respectively. -->
+<p>In these papers, it is assumed that the data can be represented by a multivariate Gaussian linear model. The model has the following form:</p>
+<p><span class="math display" id="eq:general-model">\[\begin{equation}
+  y_i \sim N(X_i \beta;\Sigma_i ), \quad i =1, \dots,n
+  \tag{1.1}
+\end{equation}\]</span></p>
+<!-- where $y_i$ $(T_i \times 1)$ is the response vector from the $i$th subject of $n$ subjects. $X_i$ $(T_i \times p)$ the design matrix and $\Sigma_i$ $(T_i \times T_i)$ the covariance matrix for subject $i$.  -->
+<p>where <span class="math inline">\(y_i\)</span> <span class="math inline">\((T_i \times 1)\)</span> is the response vector, <span class="math inline">\(X_i\)</span> <span class="math inline">\((T_i \times p)\)</span> the design matrix and <span class="math inline">\(\Sigma_i\)</span> <span class="math inline">\((T_i \times T_i)\)</span> the covariance matrix for the <span class="math inline">\(i\)</span>th subject of <span class="math inline">\(n\)</span> subjects.</p>
+<p>Papers I and II cover various methods that can be used for analysis of repeated measurements under this framework, and below is a quick overview of some of these methods.</p>
+<!-- Equivalently this can be written as: -->
+<!-- \[ y \sim N(X \beta;\Sigma ) \] -->
+<!-- where $y = (y_1,\dots, y_n)^T$, $X = (X_1,\dots, X_n)^T$ and $\Sigma = \text{block-diagonal}\{\Sigma_i\}$ -->
+<div id="methods-we-will-focus-on" class="section level2" number="1.1">
 <h2>
-<span class="header-section-number">1.1</span> In particular we will focus on:<a class="anchor" aria-label="anchor" href="#in-particular-we-will-focus-on"><i class="fas fa-link"></i></a>
+<span class="header-section-number">1.1</span> Methods we will focus on:<a class="anchor" aria-label="anchor" href="#methods-we-will-focus-on"><i class="fas fa-link"></i></a>
 </h2>
-<div id="modified-box-correction" class="section level3" number="1.1.1">
+<div id="Overview-Adjusted-Sandwich-Estimator" class="section level3" number="1.1.1">
 <h3>
-<span class="header-section-number">1.1.1</span> Modified Box Correction<a class="anchor" aria-label="anchor" href="#modified-box-correction"><i class="fas fa-link"></i></a>
+<span class="header-section-number">1.1.1</span> Adjusted Sandwich Estimator<a class="anchor" aria-label="anchor" href="#Overview-Adjusted-Sandwich-Estimator"><i class="fas fa-link"></i></a>
 </h3>
-<p>The Box correction is a correction of the one way ANOVA <span class="math inline">\(F\)</span>-statistic which follows an <span class="math inline">\(F\)</span> distribution under the assumptions of independent equally variable Gaussian errors. The Box correction <span class="math inline">\(\psi^{-1}\)</span><span class="math inline">\(F\)</span> then follows an <span class="math inline">\(F\)</span> distribution under the more general model where the Gaussian errors no longer are restricted to being independent and equally variable.</p>
-<p>In the <strong>Modified Box Correction</strong> we treat the ratio of quadratic forms as a scaled <span class="math inline">\(F\)</span>-statistic instead of a ratio of independent chi-squared distributions. The Modified Box Correction is preferred to Box’s original statistic which is conservative and hence less powerful.</p>
-<p>In order to compute the Modified Box Correction we require a consistent estimator of the covariance matrix <span class="math inline">\(\Sigma\)</span>. For example, you could use the <strong>OLS</strong> covariance estimate. However, in most software that fit mixed models the <strong>REML</strong> estimator of the covariance matrix is used and is therefore often easier to compute. The ideal case is to compute the unstructured REML estimate, but when this is not possible we can compute an estimate of <span class="math inline">\(\Sigma\)</span> with the most complex structure the data will support.</p>
-<p>In addition it is also possible to use an empirical estimator such as the sample covariance matrix, an example of this is shown in Section 6.2 of paper II. We show how the results for this example can be recreated using R in section <a href="modified-box-correction-1.html#Guinea-pigs">3.2.3</a>.</p>
+<!-- In this set up the estimate of the covariance matrix influences both the estimate of $\beta$ and then the estimation of the variance of $\beta$. -->
+<p>The sandwich estimator, shown in paper I, avoids the estimate of <span class="math inline">\(\Sigma\)</span> in the calculation of the estimate of <span class="math inline">\(\beta\)</span>. Then uses an empirical estimate of <span class="math inline">\(\Sigma\)</span> to give an estimate of the variance of <span class="math inline">\(\hat\beta\)</span>.</p>
+<p>However, the tests based on statistics using this estimator are unreliable. In Section 3 of paper I an <span class="math inline">\(F\)</span>-test using a Wald statistic which takes account of the variability in the sandwich estimator is shown.</p>
 </div>
-<div id="scheffe-contrast" class="section level3" number="1.1.2">
+<div id="Overview-Modified-Box-Correction" class="section level3" number="1.1.2">
 <h3>
-<span class="header-section-number">1.1.2</span> Scheffe contrast<a class="anchor" aria-label="anchor" href="#scheffe-contrast"><i class="fas fa-link"></i></a>
+<span class="header-section-number">1.1.2</span> Modified Box Correction<a class="anchor" aria-label="anchor" href="#Overview-Modified-Box-Correction"><i class="fas fa-link"></i></a>
 </h3>
+<p>The Box correction is a correction of the one way ANOVA <span class="math inline">\(F\)</span>-statistic which follows an <span class="math inline">\(F\)</span> distribution under the assumptions of independent equally variable Gaussian errors. Therefore we depart from the general model given by <a href="index.html#eq:general-model">(1.1)</a> and we assume <span class="math inline">\(\Sigma = \text{diag}(\sigma^2)\)</span>.</p>
+<p>The Box correction <span class="math inline">\(\psi^{-1}\)</span><span class="math inline">\(F\)</span> then follows an <span class="math inline">\(F\)</span> distribution under the more general model, where the Gaussian errors no longer are restricted to being independent and equally variable.</p>
+<p>In the <strong>modified Box correction</strong> the ratio of quadratic forms are treated as a scaled <span class="math inline">\(F\)</span>-statistic instead of a ratio of independent chi-squared distributions. The modified Box correction is preferred to Box’s original statistic which is conservative and hence less powerful.</p>
+<p>In order to compute the modified Box correction we require a consistent estimator of the covariance matrix <span class="math inline">\(\Sigma\)</span>. There are many options for this, for example, you could use the <strong>OLS</strong> covariance estimate. However, in most software that fit mixed models the <strong>REML</strong> estimator of the covariance matrix is computed and is therefore often more practical to use this as an estimate. The ideal case is to compute the unstructured REML estimate, but when this is not possible we can compute an estimate of <span class="math inline">\(\Sigma\)</span> with the most complex structure the data will support.</p>
+<p>In addition, it is also possible to use an empirical estimator such as the sample covariance matrix, an example of this is shown in Section 6.2 of paper II. We recreate the results for this example with R in subection <a href="Modified-Box-Correction.html#Guinea-pigs">4.2.3</a>.</p>
 </div>
-<div id="can-add-more" class="section level3" number="1.1.3">
+<div id="Overview-Scheffe-contrast" class="section level3" number="1.1.3">
 <h3>
-<span class="header-section-number">1.1.3</span> <em>Can add more</em><a class="anchor" aria-label="anchor" href="#can-add-more"><i class="fas fa-link"></i></a>
+<span class="header-section-number">1.1.3</span> Scheffé contrast<a class="anchor" aria-label="anchor" href="#Overview-Scheffe-contrast"><i class="fas fa-link"></i></a>
 </h3>
+<p>Alongside the modified Box correction to test for the significance of covariates on the response variable, paper II also covers how Scheffé’s method can be adapted to use the modified Box corrected statistic.</p>
+<p>Scheffé’s method can be used to test for any possible contrasts between means, and in paper II Scheffé’s method is used to give confidence intervals for individual contrasts in the guinea pig papillary muscle example (see Section 6.2 of paper II). We recreate the results of this example with R in Section <a href="Scheffe-method.html#Scheffe-method">5</a>.</p>
 <hr>
 </div>
 </div>
@@ -118,15 +138,17 @@ set in the _output.yml file.&lt;/p&gt;">
 <h2>
 <span class="header-section-number">1.2</span> SAS<a class="anchor" aria-label="anchor" href="#SAS-Intro"><i class="fas fa-link"></i></a>
 </h2>
-<p>The analysis for these two papers were carried out using SAS. In particular the procedure <strong>PROC MIXED</strong> is used to calculate an estimator of the covariance matrix. SAS provides <a href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_mixed_toc.htm" title="SAS PROC MIXED documentation">documentation</a> for <strong>PROC MIXED</strong>, in the <a href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_mixed_overview.htm">overview section</a> in the penultimate paragraph it describes how this SAS procedure fits the structure you select to the data by using the method of restricted maximum likelihood (REML).</p>
+<p>The analysis for these two papers were carried out using SAS. In particular, the procedure <strong>PROC MIXED</strong> is used to calculate an estimator of the covariance matrix for the modified Box correction. SAS provides <a href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_mixed_toc.htm" title="SAS PROC MIXED documentation">documentation</a> for <strong>PROC MIXED</strong>, and in the penultimate paragraph within the <a href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_mixed_overview.htm">overview section</a> it describes how this SAS procedure fits the structure you select to the data by using the method of restricted maximum likelihood (REML).</p>
+<p>In this tutorial we focus on providing functions in R to compute the methods described in the papers, and we only present the SAS code used by Simon Skene to calculate the results for example 6.1 in paper II.</p>
 <hr>
 </div>
 <div id="R-Intro" class="section level2" number="1.3">
 <h2>
 <span class="header-section-number">1.3</span> R<a class="anchor" aria-label="anchor" href="#R-Intro"><i class="fas fa-link"></i></a>
 </h2>
-<p>There are multiple packages in R that allow you to fit mixed models. The most popular are the <strong>nlme</strong> and <strong>lme4</strong> package. Some of the differences between the two packages are described on page 4 of the <strong>lme4</strong> package <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" title="lme4 R package documentation">documentation</a>.</p>
-<p>The main difference is that the <strong>nlme</strong> package allows more flexibility in choosing complex variance-covariance structures. With the <strong>lme4</strong> package only allowing us to select the correlation structure between individuals via the random effects (G side).</p>
+<p>For all three methods listed above (<a href="Sandwich-Estimator.html#Sandwich-Estimator">Sandwich Estimator</a>, <a href="Modified-Box-Correction.html#Modified-Box-Correction">Modified Box Correction</a> and <a href="Scheffe-method.html#Scheffe-method">Scheffé contrasts</a>) we provide R functions that compute them. The modified Box correction requires an estimate for <span class="math inline">\(\Sigma\)</span> and in paper II a REML estimate is used. In order to compute this estimate we utilise R packages that fit mixed models.</p>
+<p>There are multiple packages that fit mixed models in R, with the most popular being the <strong>nlme</strong> and <strong>lme4</strong> packages. Both of these packages use REML by default to fit the mixed model, therefore we can use them to extract an estimate of the covariance matrix to compute the modified Box correction.</p>
+<p>Some of the differences between the two packages are described on page 4 of the <strong>lme4</strong> package <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" title="lme4 R package documentation">documentation</a>. The main difference is that the <strong>nlme</strong> package allows more flexibility in choosing complex variance-covariance structures. On the other hand, the <strong>lme4</strong> package only allows us to induce a correlation structure between individuals by including random effects in the model.</p>
 
 </div>
 </div>
@@ -142,10 +164,10 @@ set in the _output.yml file.&lt;/p&gt;">
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
 <li>
-<a class="nav-link" href="#in-particular-we-will-focus-on"><span class="header-section-number">1.1</span> In particular we will focus on:</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#modified-box-correction"><span class="header-section-number">1.1.1</span> Modified Box Correction</a></li>
-<li><a class="nav-link" href="#scheffe-contrast"><span class="header-section-number">1.1.2</span> Scheffe contrast</a></li>
-<li><a class="nav-link" href="#can-add-more"><span class="header-section-number">1.1.3</span> Can add more</a></li>
+<a class="nav-link" href="#methods-we-will-focus-on"><span class="header-section-number">1.1</span> Methods we will focus on:</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#Overview-Adjusted-Sandwich-Estimator"><span class="header-section-number">1.1.1</span> Adjusted Sandwich Estimator</a></li>
+<li><a class="nav-link" href="#Overview-Modified-Box-Correction"><span class="header-section-number">1.1.2</span> Modified Box Correction</a></li>
+<li><a class="nav-link" href="#Overview-Scheffe-contrast"><span class="header-section-number">1.1.3</span> Scheffé contrast</a></li>
 </ul>
 </li>
 <li><a class="nav-link" href="#SAS-Intro"><span class="header-section-number">1.2</span> SAS</a></li>
@@ -167,7 +189,7 @@ set in the _output.yml file.&lt;/p&gt;">
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in (Skene &amp; Kenward, 2010)</strong>" was written by Dylan Dijk. It was last built on 2022-08-22.</p>
+    <p>"<strong>Methods in (Skene &amp; Kenward, 2010)</strong>" was written by Dylan Dijk. It was last built on 2022-09-09.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
