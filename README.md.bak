@@ -1,13 +1,6 @@
-Welcome! 
+# Methods in (Skene & Kenward, 2010)
 
-This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). 
+This repository holds the code for the [Methods in (Skene & Kenward, 2010)](https://bookdown.org/dylanonslowfc11/Mixed-Models-Small-Sample-Tutorial-bs4/Modified-Box-Correction.html) tutorial.
+The tutorial was built with [**bookdown**](https://github.com/rstudio/bookdown). 
 
-This template provides a skeleton file structure that you can edit to create your book. 
 
-The contents inside the .Rmd files provide some pointers to help you get started, but feel free to also delete the content in each file and start fresh.
-
-Additional resources:
-
-The **bookdown** book: https://bookdown.org/yihui/bookdown/
-
-The **bookdown** package reference site: https://pkgs.rstudio.com/bookdown
